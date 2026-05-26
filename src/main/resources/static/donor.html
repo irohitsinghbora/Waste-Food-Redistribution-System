@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Donor Dashboard</title>
+
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+        }
+
+        .container {
+            width: 700px;
+            margin: 40px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin: 8px 0;
+        }
+
+        button {
+            padding: 10px;
+            background-color: green;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: center;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>Donor Dashboard</h2>
+
+    <input type="text" id="foodName" placeholder="Food Name">
+
+    <input type="number" id="quantity" placeholder="Quantity">
+
+    <input type="text" id="location" placeholder="Location">
+
+    <input type="text" id="expiryTime" placeholder="Expiry Time">
+
+    <button onclick="addDonation()">Add Donation</button>
+
+    <table>
+
+        <thead>
+        <tr>
+            <th>Food</th>
+            <th>Quantity</th>
+            <th>Location</th>
+            <th>Expiry</th>
+            <th>Status</th>
+            <th>Delete</th>
+        </tr>
+        </thead>
+
+        <tbody id="tableBody"></tbody>
+
+    </table>
+
+</div>
+
+<script>
+
+    function loadDonations() {
+
+        fetch("/donations/all")
+
+            .then(res => res.json())
+
+            .then(data => {
+
+                let rows = "";
+
+                data.forEach(d => {
+
+                    rows += `
+                    <tr>
+                        <td>${d.foodName}</td>
+                        <td>${d.quantity}</td>
+                        <td>${d.location}</td>
+                        <td>${d.expiryTime}</td>
+                        <td>${d.status}</td>
+
+                        <td>
+                            <button onclick="deleteDonation(${d.id})">
+                                Delete
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                });
+
+                document.getElementById("tableBody").innerHTML = rows;
+            });
+    }
+
+    function addDonation() {
+
+        const data = {
+
+            foodName: document.getElementById("foodName").value,
+            quantity: document.getElementById("quantity").value,
+            location: document.getElementById("location").value,
+            expiryTime: document.getElementById("expiryTime").value
+
+        };
+
+        fetch("/donations/add", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify(data)
+
+        })
+
+            .then(res => res.json())
+
+            .then(() => {
+
+                alert("Donation Added");
+
+                loadDonations();
+            });
+    }
+
+    function deleteDonation(id) {
+
+        fetch(`/donations/delete/${id}`, {
+
+            method: "DELETE"
+
+        })
+
+            .then(() => {
+
+                alert("Donation Deleted");
+
+                loadDonations();
+            });
+    }
+
+    loadDonations();
+
+</script>
+
+</body>
+</html>

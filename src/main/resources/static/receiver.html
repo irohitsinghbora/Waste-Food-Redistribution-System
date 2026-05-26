@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Receiver Dashboard</title>
+
+  <style>
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f6f8;
+    }
+
+    .container {
+      width: 800px;
+      margin: 40px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+    }
+
+    table {
+      width: 100%;
+      margin-top: 20px;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: center;
+    }
+
+    button {
+      padding: 8px 12px;
+      background-color: blue;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <h2>Receiver Dashboard</h2>
+
+  <table>
+
+    <thead>
+    <tr>
+      <th>Food</th>
+      <th>Quantity</th>
+      <th>Location</th>
+      <th>Expiry</th>
+      <th>Status</th>
+      <th>Action</th>
+    </tr>
+    </thead>
+
+    <tbody id="tableBody"></tbody>
+
+  </table>
+
+</div>
+
+<script>
+
+  function loadDonations() {
+
+    fetch("/donations/all")
+
+            .then(res => res.json())
+
+            .then(data => {
+
+              let rows = "";
+
+              data.forEach(d => {
+
+                rows += `
+                    <tr>
+                        <td>${d.foodName}</td>
+                        <td>${d.quantity}</td>
+                        <td>${d.location}</td>
+                        <td>${d.expiryTime}</td>
+                        <td>${d.status}</td>
+
+                        <td>
+                            <button onclick="acceptDonation(${d.id})">
+                                Accept
+                            </button>
+                        </td>
+                    </tr>
+                `;
+              });
+
+              document.getElementById("tableBody").innerHTML = rows;
+            });
+  }
+
+  function acceptDonation(id) {
+
+    fetch(`/donations/accept/${id}`, {
+
+      method: "PUT"
+
+    })
+
+            .then(res => res.json())
+
+            .then(() => {
+
+              alert("Donation Accepted");
+
+              // auto delete after accept
+
+              fetch(`/donations/delete/${id}`, {
+
+                method: "DELETE"
+
+              })
+
+                      .then(() => {
+
+                        loadDonations();
+                      });
+            });
+  }
+
+  loadDonations();
+
+</script>
+
+</body>
+</html>

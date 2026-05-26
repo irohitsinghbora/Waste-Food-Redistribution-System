@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Waste Food Redistribution Login</title>
+
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+        }
+
+        .container {
+            width: 350px;
+            margin: 80px auto;
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: green;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: darkgreen;
+        }
+
+    </style>
+
+</head>
+<body>
+
+<div class="container">
+
+    <h2>Login</h2>
+
+    <input type="text" id="username" placeholder="Username">
+
+    <input type="password" id="password" placeholder="Password">
+
+    <button onclick="login()">Login</button>
+
+    <hr>
+
+    <h2>Register</h2>
+
+    <input type="text" id="rusername" placeholder="Username">
+
+    <input type="password" id="rpassword" placeholder="Password">
+
+    <select id="role">
+        <option value="DONOR">Donor</option>
+        <option value="RECEIVER">Receiver</option>
+    </select>
+
+    <button onclick="register()">Register</button>
+
+</div>
+
+<script>
+
+    function register() {
+
+        const data = {
+            username: document.getElementById("rusername").value,
+            password: document.getElementById("rpassword").value,
+            role: document.getElementById("role").value
+        };
+
+        fetch("/auth/register", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify(data)
+
+        })
+            .then(res => res.json())
+            .then(data => {
+
+                alert("Registration Successful");
+
+            });
+    }
+
+    function login() {
+
+        const data = {
+
+            username: document.getElementById("username").value,
+            password: document.getElementById("password").value
+
+        };
+
+        fetch("/auth/login", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify(data)
+
+        })
+            .then(res => res.json())
+            .then(user => {
+
+                if(user.role === "DONOR") {
+
+                    window.location.href = "/donor.html";
+                }
+
+                else if(user.role === "RECEIVER") {
+
+                    window.location.href = "/receiver.html";
+                }
+
+                else {
+
+                    alert("Invalid Login");
+                }
+
+            });
+    }
+
+</script>
+
+</body>
+</html>
